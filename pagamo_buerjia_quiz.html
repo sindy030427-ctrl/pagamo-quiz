@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PaGamO 不二家測驗｜你有資格解鎖 Lv5 嗎？</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --teal-mid: #5DCAA5;
+    --teal-dark: #085041;
+    --gold: #BA7517;
+    --gold-light: #FAEEDA;
+    --text: #1a1a1a;
+    --text-muted: #6b6b6b;
+    --bg: #f7f9f8;
+    --white: #ffffff;
+    --border: rgba(0,0,0,0.1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2rem 1rem 4rem;
+  }
+
+  /* header */
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    animation: fadeDown 0.6s ease both;
+  }
+  .pagamo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--teal-light);
+    color: var(--teal-dark);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 1rem;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
+  .header h1 {
+    font-size: clamp(22px, 5vw, 30px);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+  }
+  .header p {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* card */
+  .card {
+    background: var(--white);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    padding: 2rem;
+    width: 100%;
+    max-width: 520px;
+    animation: fadeUp 0.5s ease both;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+  }
+
+  /* progress */
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.75rem;
+  }
+  .progress-bg {
+    flex: 1;
+    height: 5px;
+    background: #e8ede9;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal-mid), var(--teal));
+    border-radius: 10px;
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+  }
+  .progress-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  /* question */
+  .q-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--teal);
+    margin-bottom: 0.6rem;
+    text-transform: uppercase;
+  }
+  .q-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.55;
+    margin-bottom: 1.5rem;
+  }
+
+  /* options */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .opt {
+    background: var(--bg);
+    border: 1.5px solid transparent;
+    border-radius: 12px;
+    padding: 13px 16px;
+    font-size: 15px;
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    line-height: 1.5;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+  .opt:hover { background: var(--teal-light); border-color: var(--teal-mid); }
+  .opt.selected { background: var(--teal-light); border-color: var(--teal); color: var(--teal-dark); }
+
+  /* next button */
+  .next-btn {
+    margin-top: 1.5rem;
+    width: 100%;
+    padding: 14px;
+    background: var(--teal);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Noto Sans TC', sans-serif;
+    cursor: pointer;
+    display: none;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.5px;
+  }
+  .next-btn:hover { background: var(--teal-dark); }
+  .next-btn:active { transform: scale(0.98); }
+
+  /* result */
+  .result-card {
+    background: var(--white);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 520px;
+    text-align: center;
+    display: none;
+    animation: fadeUp 0.5s ease both;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+  }
+  .result-icon {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: var(--teal-light);
+    border: 3px solid var(--teal-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    margin: 0 auto 1.25rem;
+  }
+  .result-icon.legendary {
+    background: var(--gold-light);
+    border-color: var(--gold);
+    animation: pulse 2s ease infinite;
+  }
+  .result-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--teal-dark);
+    background: var(--teal-light);
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 0.75rem;
+  }
+  .result-tag.legendary { color: #633806; background: var(--gold-light); }
+  .result-name {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+  }
+  .result-sub {
+    font-size: 13px;
+    color: var(--teal);
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+  }
+  .result-sub.legendary { color: var(--gold); }
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1.25rem 0;
+  }
+  .result-desc {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+  }
+  .score-pill {
+    display: inline-block;
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--bg);
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 1.75rem;
+  }
+  .actions { display: flex; gap: 10px; }
+  .btn-outline {
+    flex: 1;
+    padding: 13px;
+    background: transparent;
+    color: var(--text);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Noto Sans TC', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-outline:hover { background: var(--bg); }
+  .btn-primary {
+    flex: 1;
+    padding: 13px;
+    background: var(--teal);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Noto Sans TC', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: var(--teal-dark); }
+
+  /* footer */
+  .footer {
+    margin-top: 2rem;
+    font-size: 12px;
+    color: #aaa;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+  .footer span { color: var(--teal-mid); font-weight: 700; }
+
+  /* animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(186,117,23,0.25); }
+    50% { box-shadow: 0 0 0 10px rgba(186,117,23,0); }
+  }
+
+  /* share toast */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #1a1a1a;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-family: 'Noto Sans TC', sans-serif;
+    transition: transform 0.3s ease;
+    z-index: 999;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 480px) {
+    .card, .result-card { padding: 1.5rem; }
+    .q-text { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="pagamo-badge"><div class="dot"></div> PaGamO 教師認證</div>
+  <h1>你有資格解鎖 Lv5 不二家嗎？</h1>
+  <p>8 題測驗，看看你被教師生涯磨出了什麼等級</p>
+</div>
+
+<div class="card" id="quiz-card">
+  <div class="progress-wrap">
+    <div class="progress-bg"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+    <div class="progress-label" id="progress-label">1 / 8</div>
+  </div>
+  <div class="q-num" id="q-num">Q1</div>
+  <div class="q-text" id="q-text"></div>
+  <div class="options" id="options"></div>
+  <button class="next-btn" id="next-btn">下一題 →</button>
+</div>
+
+<div class="result-card" id="result-card">
+  <div class="result-icon" id="r-icon"></div>
+  <div class="result-tag" id="r-tag"></div>
+  <div class="result-name" id="r-name"></div>
+  <div class="result-sub" id="r-sub"></div>
+  <div class="divider"></div>
+  <div class="result-desc" id="r-desc"></div>
+  <div class="score-pill" id="r-score"></div>
+  <div class="actions">
+    <button class="btn-outline" onclick="copyResult()">複製結果分享</button>
+    <button class="btn-primary" onclick="restart()">再測一次</button>
+  </div>
+</div>
+
+<div class="footer">由 <span>PaGamO</span> 教學團隊製作 · 愚人節限定測驗</div>
+<div class="toast" id="toast">已複製，貼到社群分享吧！</div>
+
+<script>
+const questions = [
+  {
+    text: "學期開始第一天，你的心情是？",
+    options: ["充滿期待，準備好了！", "還好，先看看再說", "已經開始倒數放假", "什麼心情？活下去就對了"],
+    scores: [0, 1, 2, 3]
+  },
+  {
+    text: "家長傳訊息說「我小孩在家很乖喔」，你的第一反應是？",
+    options: ["謝謝家長，我會繼續觀察", "嗯⋯⋯好的，謝謝您", "（默默看了一眼上週小考成績）", "微笑，然後關掉手機"],
+    scores: [0, 1, 3, 2]
+  },
+  {
+    text: "深夜 11 點，你在做什麼？",
+    options: ["睡覺，明天還要上班", "追劇放鬆", "備課或批改作業", "備課、批改、還順便回家長訊息"],
+    scores: [0, 1, 2, 3]
+  },
+  {
+    text: "全班突然安靜下來，你的感覺是？",
+    options: ["很好，教室氣氛正常", "開心，今天狀態不錯", "警覺，一定有什麼事", "先享受三秒，等等再說"],
+    scores: [0, 1, 2, 3]
+  },
+  {
+    text: "同一件事說了好幾次，學生還是沒聽到，你會？",
+    options: ["耐心再說一次", "深呼吸，然後再說", "說完看學生表情，心裡自己知道", "我已經不算次數了"],
+    scores: [0, 1, 2, 3]
+  },
+  {
+    text: "學期末看到學生進步，你的心情是？",
+    options: ["非常感動，值得了", "還不錯，有努力到", "欣慰，但馬上想到下學期", "先感動，等一下再崩潰"],
+    scores: [1, 2, 3, 3]
+  },
+  {
+    text: "臨時被要求交一份從沒聽說過的表單，你會？",
+    options: ["詢問清楚再填", "上網查一下格式", "憑直覺填完送出", "默默打開舊檔案複製貼上"],
+    scores: [0, 1, 2, 3]
+  },
+  {
+    text: "愚人節看到 PaGamO 宣布推出「不二家」隱藏等級，你的反應是？",
+    options: ["哈哈，明顯是假的", "等等⋯⋯好像有點像真的？", "認真看完所有解鎖條件", "截圖存下來再說"],
+    scores: [0, 1, 2, 3]
+  }
+];
+
+const results = [
+  {
+    min: 0, max: 6,
+    icon: "🌱",
+    legendary: false,
+    tag: "潛力新人",
+    name: "冒險家潛力股",
+    sub: "距離不二家還有一段路⋯⋯",
+    desc: "你還沒被磨夠，但這不是壞事。繼續教下去，不二家的大門遲早為你開。"
+  },
+  {
+    min: 7, max: 12,
+    icon: "📚",
+    legendary: false,
+    tag: "成長中",
+    name: "素養家進化中",
+    sub: "不二家的邊緣人",
+    desc: "幾題的答案讓系統偵測到你的潛力。再撐幾個學期，你懂的。"
+  },
+  {
+    min: 13, max: 18,
+    icon: "🧭",
+    legendary: false,
+    tag: "候補資格",
+    name: "領航家資深班",
+    sub: "不二家候補資格已開啟",
+    desc: "已具備相當程度的教師生存本能。系統正在觀察你，保持下去。"
+  },
+  {
+    min: 19, max: 24,
+    icon: "✦",
+    legendary: true,
+    tag: "Lv5 隱藏等級",
+    name: "不二家",
+    sub: "解鎖成功",
+    desc: "你不需要別人告訴你什麼是不二——因為你早就活出來了。歡迎加入，老師。"
+  }
+];
+
+let current = 0, total = 0, selected = null;
+
+function render() {
+  const q = questions[current];
+  document.getElementById('q-num').textContent = `Q${current + 1}`;
+  document.getElementById('progress-label').textContent = `${current + 1} / ${questions.length}`;
+  document.getElementById('progress').style.width = `${(current / questions.length) * 100}%`;
+  document.getElementById('q-text').textContent = q.text;
+
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+  q.options.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.textContent = o;
+    btn.onclick = () => pick(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const nb = document.getElementById('next-btn');
+  nb.style.display = 'none';
+  nb.textContent = current === questions.length - 1 ? '查看結果 →' : '下一題 →';
+  selected = null;
+}
+
+function pick(i, btn) {
+  document.querySelectorAll('.opt').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selected = i;
+  document.getElementById('next-btn').style.display = 'block';
+}
+
+document.getElementById('next-btn').onclick = () => {
+  if (selected === null) return;
+  total += questions[current].scores[selected];
+  current++;
+  if (current < questions.length) {
+    render();
+  } else {
+    showResult();
+  }
+};
+
+function showResult() {
+  document.getElementById('quiz-card').style.display = 'none';
+  const rc = document.getElementById('result-card');
+  rc.style.display = 'block';
+
+  const r = results.find(r => total >= r.min && total <= r.max) || results[results.length - 1];
+
+  const icon = document.getElementById('r-icon');
+  icon.textContent = r.icon;
+  icon.className = 'result-icon' + (r.legendary ? ' legendary' : '');
+
+  const tag = document.getElementById('r-tag');
+  tag.textContent = r.tag;
+  tag.className = 'result-tag' + (r.legendary ? ' legendary' : '');
+
+  document.getElementById('r-name').textContent = r.name;
+
+  const sub = document.getElementById('r-sub');
+  sub.textContent = r.sub;
+  sub.className = 'result-sub' + (r.legendary ? ' legendary' : '');
+
+  document.getElementById('r-desc').textContent = r.desc;
+  document.getElementById('r-score').textContent = `測驗分數 ${total} / ${questions.length * 3}`;
+
+  window._resultData = r;
+}
+
+function copyResult() {
+  const r = window._resultData;
+  if (!r) return;
+  const text = `【PaGamO 不二家測驗結果】\n我的等級：${r.name}\n${r.sub}\n\n${r.desc}\n\n你也來測看看 👉 pagamo.com`;
+  navigator.clipboard.writeText(text).then(() => {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  });
+}
+
+function restart() {
+  current = 0; total = 0; selected = null;
+  document.getElementById('result-card').style.display = 'none';
+  document.getElementById('quiz-card').style.display = 'block';
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
